@@ -1,0 +1,79 @@
+apply plugin: 'com.android.application'
+apply plugin: 'walle'
+
+android {
+    signingConfigs {
+        debug {
+            storeFile file('./sign/coins.keystore')
+            storePassword '2019coins'
+            keyPassword '2019coins'
+            keyAlias = 'debug'
+        }
+        release {
+            storeFile file('./sign/coins.keystore')
+        }
+    }
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "com.lqos.coin"
+        minSdkVersion 14
+        targetSdkVersion 29
+        versionCode 2
+        versionName "1.0.1"
+
+        resConfigs 'zh-rCN'
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // 设置默认值,均线上环境配置
+        manifestPlaceholders = [
+                UMENG_CHANNEL: "app_debug",
+                UMENG_APPKEY : "5e9acb64167edd687c00002d",
+        ]
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true  //混淆代码
+            zipAlignEnabled true
+            shrinkResources true //资源瘦身
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+            // 设置默认值,均线上环境配置
+            manifestPlaceholders = [
+                    UMENG_CHANNEL: "app",
+                    UMENG_APPKEY : "5e9ac411895cca2c9c0000e4",
+            ]
+        }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+}
+walle {
+    apkOutputFolder = new File("${project.buildDir}/outputs/channels")
+//    apkFileNameFormat = '${appName}-${packageName}-${channel}-${buildType}-v${versionName}-${versionCode}-${buildTime}-${flavorName}.apk'
+    apkFileNameFormat = 'coins-${channel}-${buildType}-v${versionName}-${versionCode}-${buildTime}.apk'
+    //configFile与channelFile两者必须存在一个，否则无法生成渠道包。两者都存在时优先执行configFile
+    channelFile = new File("${project.getProjectDir()}/channels")
+    //configFile = new File("${project.getProjectDir()}/config.json")
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+//    implementation 'androidx.appcompat:appcompat:1.1.0'
+//    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation 'com.umeng.umsdk:analytics:8.0.0'
+    implementation 'com.umeng.umsdk:common:2.0.0'
+    implementation 'com.umeng.umsdk:utdid:1.1.5.3'
+
+    implementation 'com.meituan.android.walle:library:1.1.6'
+}
