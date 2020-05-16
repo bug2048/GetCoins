@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         startService(new Intent(this, CoinsService.class));
-        if (!enabled(this, "com.lqos.coin/com.lqos.coin.service.AccessibilityServiceIml")) {
+        if (!enabled(this, "com.lqos.coin/com.lqos.coin.service.CoinsService")) {
             startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
             isToStart = true;
         } else {
@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
         if (isToStart) {
-            if (enabled(this, "com.lqos.coin/com.lqos.coin.service.AccessibilityServiceIml")) {
+            if (enabled(this, "com.lqos.coin/com.lqos.coin.service.CoinsService")) {
                 Toast.makeText(getApplicationContext(), "开启成功", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getApplicationContext(), "开启失败", Toast.LENGTH_SHORT).show();

@@ -37,15 +37,11 @@ public class CoinsService extends AccessibilityService implements Runnable {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             int ac = event.getEventType();
-            switch (ac) {
-                case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
-                case AccessibilityEvent.TYPE_WINDOWS_CHANGED:
-                case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-                    String temp = event.getPackageName().toString();
-                    if (!TextUtils.isEmpty(temp) && (!temp.contains("android") || !temp.contains("java"))) {
-                        packName = event.getPackageName().toString();
-                    }
-                    break;
+            if (ac == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED || ac == AccessibilityEvent.TYPE_WINDOWS_CHANGED || ac == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+                String temp = event.getPackageName().toString();
+                if (!TextUtils.isEmpty(temp) && (!temp.contains("android") || !temp.contains("java"))) {
+                    packName = event.getPackageName().toString();
+                }
             }
         }
     }
@@ -89,6 +85,18 @@ public class CoinsService extends AccessibilityService implements Runnable {
 
             }
         }, null);
+    }
+
+    private boolean hasInter() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            AccessibilityNodeInfo accessibilityNodeInfo = getRootInActiveWindow();
+            if (accessibilityNodeInfo == null) {
+                return false;
+            }
+            List<AccessibilityNodeInfo> list = accessibilityNodeInfo.findAccessibilityNodeInfosByText("广告");
+            return list != null && !list.isEmpty();
+        }
+        return false;
     }
 
     private boolean tt(String packName, Task task) {
@@ -174,9 +182,11 @@ public class CoinsService extends AccessibilityService implements Runnable {
             for (; !isFinish; ) {
                 if (PackName.PACKLIST.containsKey(packName)) {
                     try {
-                        Thread.sleep(nextTime * 1000);
+                        if (!hasInter()) {
+                            Thread.sleep(nextTime * 1000);
+                        }
                         nextTime = random.nextInt(20);
-                        System.out.println("CoinsService.run = " + nextTime);
+//                        System.out.println("CoinsService.run = " + nextTime);
                         swipe(packName);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
